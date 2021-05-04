@@ -1,5 +1,7 @@
 import telebot
 from telebot import types
+import requests, feedparser
+from get_chefkoch import chefkoch
 
 bot = telebot.TeleBot('1785162747:AAE0tN5e3yY6OG771g8MJ_S1_hnNwnfTG3s')
 
@@ -10,6 +12,9 @@ user_gender = ''
 user_lifestyle = ''
 user_result = None
 
+c=chefkoch()
+recipe = c.daily_recipe()
+
 
 # start
 @bot.message_handler(commands=['start'])
@@ -19,15 +24,18 @@ def keyboard(message):
     itembtn2 = types.KeyboardButton("RECIPES")
 
     key.add(itembtn1, itembtn2)
-    msg = bot.send_message(message.chat.id, "Hi, I'm a healthy bot. I'm so glad to meet you!/nI have two options and I think you will like it)/nIf you have any problem, you may text me /help and I will be here for you",
+    msg = bot.send_message(message.chat.id, "Hi, I'm a healthy bot. I'm so glad to meet you!\n"
+                           "I have two options and I think you will like it)\nIf you have any "
+                           "problem, you may text me \n/help and I will be here for you",
                            reply_markup=key)
     bot.register_next_step_handler(msg, process_switch_step)
 
 
 # help
-@bot.message_handler(commands=["help"])
+@bot.message_handler(commands=['help'])
 def help_section(message):
-    bot.send_message(message.chat.id, "Hi, I'm a healthy bot, who will help you to be healthier and stronger!/nIf you want to know what is your daily caloric, then press the DAILY CALORIC./nIf you want to get the recipe, then press the RECIPES.")
+    bot.send_message(message.chat.id, "Hey, I'm here to help you.\nIf you want to calculate the calorie goals, "
+                     "\nthen press the DAILY CALORIC.\nIf you don't know what to cook, \nthen press the RECIPES.")
 
 
 # buttons with functions
@@ -168,14 +176,16 @@ def calc():
     return user_result
 
 #recipe
-def get_recipe():
-    while 0>1:
-        print("love you")
-    
+def get_recipe(message):
+    bot.send_message(message.chat.id, recipe.category)
+    bot.send_message(message.chat.id, recipe.name)
+    bot.send_message(message.chat.id, recipe.ingredients)
+    bot.send_message(message.chat.id, recipe.description)
+
 
 bot.enable_save_next_step_handlers(delay=2)
 
 bot.load_next_step_handlers()
 
 if __name__ == "__main__":
-    bot.polling(none_stop=True)
+    bot.polling(none_stop=True, interval=0)
